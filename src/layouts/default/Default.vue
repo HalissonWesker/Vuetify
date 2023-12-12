@@ -25,9 +25,11 @@
     </v-navigation-drawer> 
 
    <v-app-bar class="border-b">
-    <v-avatar fit ></v-avatar>
-    <v-app-bar-nav-icon @click="openDrawer = !openDrawer"></v-app-bar-nav-icon>   
-    <v-app-bar-title>Meu app</v-app-bar-title>    
+     <v-app-bar-nav-icon @click="openDrawer = !openDrawer"></v-app-bar-nav-icon>   
+     <v-avatar size="90" tile>
+       <v-img src="https://img.freepik.com/vetores-premium/modelo-de-logotipo-de-fitness-e-academia_18099-1557.jpg"></v-img>
+     </v-avatar>
+    <v-app-bar-title>Dashboard</v-app-bar-title>    
    
     <template #append>
 

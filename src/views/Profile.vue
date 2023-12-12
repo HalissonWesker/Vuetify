@@ -1,5 +1,5 @@
 <template>
-    <profile-home />
+    <ProfileHome />
 </template>
 
 <script setup>

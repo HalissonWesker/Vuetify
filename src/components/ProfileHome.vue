@@ -49,22 +49,17 @@
 </template>
 
 <script>
-const fs = require('fs-extra');
 
 export default {
   data() {
     return {
       isMouseOver: false,
       isCoverMouseOver: false,
-      onload: false,
-      imagemSelecionada: 'leon.jpg'
+      onLoad: false,
+      imagemSelecionada: 'leon.jpg',
     };
   },
   methods: {
-    openUploadDialog() {
-      // Lógica para abrir o diálogo de upload
-      console.log('Abrir diálogo de upload');
-    },
     showCameraIcon(value) {
       this.isMouseOver = value;
     },
@@ -79,24 +74,48 @@ export default {
       const file = event.target.files[0];
 
       if (file) {
-        // Caminho temporário onde o arquivo é inicialmente armazenado pelo navegador
-        const tempPath = file.path;
+        // Use FileReader para ler o conteúdo do arquivo como uma URL de dados
+        const reader = new FileReader();
 
-        // Caminho de destino na pasta 'public' (ou sua pasta de destino)
-        const destPath = `public/${file.name}`;
+        reader.onload = (e) => {
+          
+          // Mova o arquivo para a pasta 'public' no servidor
+          this.moveFileToPublic(file);
 
-        // Mova o arquivo para a pasta 'public'
-        fs.move(tempPath, destPath, (err) => {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log('Arquivo movido com sucesso para a pasta public');
-          }
-        });
+          // Atualize o estado com a URL da imagem
+          this.imagemSelecionada = e.target.result;
+        };
 
-        // Atualize o estado com o caminho da imagem
-        this.imagemSelecionada = destPath;
+        // Leia o conteúdo do arquivo como uma URL de dados
+        reader.readAsDataURL(file);
       }
+    },
+    moveFileToPublic(file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        // Crie um objeto FormData para enviar o arquivo como parte de uma solicitação POST
+        const formData = new FormData();
+        formData.append('file', new Blob([reader.result]), file.name);
+
+        // Use fetch para enviar o arquivo para o servidor
+        fetch('http://192.168.18.18:3000/upload', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('Arquivo enviado com sucesso para a pasta public:', data);
+            // Atualize o estado com o caminho da imagem (se necessário)
+            this.imagemSelecionada = data.filePath;
+          })
+          .catch((error) => {
+            console.error('Erro ao enviar arquivo para a pasta public:', error);
+          });
+      };
+
+      // Leia o conteúdo do arquivo como ArrayBuffer
+      reader.readAsArrayBuffer(file);
     },
   },
 };
